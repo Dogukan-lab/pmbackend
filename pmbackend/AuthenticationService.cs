@@ -77,6 +77,7 @@ namespace pmbackend
             {
                 new Claim(ClaimTypes.Name, pmUser.Username),
                 new Claim(ClaimTypes.Role, "User"),
+                // new Claim(ClaimTypes.)
             };
 
             
@@ -86,7 +87,7 @@ namespace pmbackend
 
             var securityToken = new JwtSecurityToken(
                 claims: customClaims,
-                expires: DateTime.Now.AddMinutes(10),
+                expires: DateTime.Now.AddDays(2),
                 issuer: _configuration.GetSection("Jwt:Issuer").Value,
                 audience: _configuration.GetSection("Jwt:Audience").Value,
                 signingCredentials: signingCredentials);

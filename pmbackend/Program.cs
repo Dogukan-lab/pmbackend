@@ -20,7 +20,7 @@ builder.Services.AddDbContext<PaleMessengerContext>(options =>
 var app = builder.Build();
 
 /*Needed for later */
-SeedDb.SeedUserIdentities(app);
+// SeedDb.SeedUserIdentities(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

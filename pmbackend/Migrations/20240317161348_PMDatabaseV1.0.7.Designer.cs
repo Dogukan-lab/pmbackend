@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pmbackend.Database;
 
@@ -10,9 +11,11 @@ using pmbackend.Database;
 namespace pmbackend.Migrations
 {
     [DbContext(typeof(PaleMessengerContext))]
-    partial class PaleMessengerContextModelSnapshot : ModelSnapshot
+    [Migration("20240317161348_PMDatabaseV1.0.7")]
+    partial class PMDatabaseV107
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,21 +148,6 @@ namespace pmbackend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("UserFriend", b =>
-                {
-                    b.Property<int>("FriendsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PmUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FriendsId", "PmUserId");
-
-                    b.HasIndex("PmUserId");
-
-                    b.ToTable("UserFriend");
-                });
-
             modelBuilder.Entity("pmbackend.Models.PmUser", b =>
                 {
                     b.Property<int>("Id")
@@ -206,6 +194,9 @@ namespace pmbackend.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<int?>("PmUserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ProfileIcon")
                         .HasColumnType("int");
 
@@ -227,6 +218,8 @@ namespace pmbackend.Migrations
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
+
+                    b.HasIndex("PmUserId");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -282,19 +275,16 @@ namespace pmbackend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("UserFriend", b =>
+            modelBuilder.Entity("pmbackend.Models.PmUser", b =>
                 {
                     b.HasOne("pmbackend.Models.PmUser", null)
-                        .WithMany()
-                        .HasForeignKey("FriendsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("Friends")
+                        .HasForeignKey("PmUserId");
+                });
 
-                    b.HasOne("pmbackend.Models.PmUser", null)
-                        .WithMany()
-                        .HasForeignKey("PmUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            modelBuilder.Entity("pmbackend.Models.PmUser", b =>
+                {
+                    b.Navigation("Friends");
                 });
 #pragma warning restore 612, 618
         }

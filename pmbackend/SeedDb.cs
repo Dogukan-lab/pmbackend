@@ -58,10 +58,10 @@ public class SeedDb
             //Same here.
             return;
         }
-        
+
         //Create manager
         var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<PmUser>>();
-            
+
         //Setup users
         var duncan = new PmUser
         {
@@ -75,9 +75,26 @@ public class SeedDb
             ProfileIcon = 0,
             Background = 0,
         };
-            
+        var tester = new PmUser
+        {
+            UserName = "Tester",
+            ProfileIcon = 1,
+            Background = 0,
+        };
+
         userManager.CreateAsync(duncan, "Duncan#1").GetAwaiter().GetResult();
         userManager.CreateAsync(lars, "Lars#1").GetAwaiter().GetResult();
+        userManager.CreateAsync(tester, "Tester#1").GetAwaiter().GetResult();
+
+        //Add friend relationship
+        duncan.Friends = new List<PmUser> { lars, tester,};
+        lars.Friends = new List<PmUser> { duncan, tester,};
+        tester.Friends = new List<PmUser> { lars, duncan,};
+
+        //Update created entries
+        userManager.UpdateAsync(duncan).GetAwaiter().GetResult();
+        userManager.UpdateAsync(lars).GetAwaiter().GetResult();
+        userManager.UpdateAsync(tester).GetAwaiter().GetResult();
 
         // var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         //This doesn't work for some reason
@@ -90,6 +107,5 @@ public class SeedDb
     //Maybe check if we can use this instead.
     private void CreateUser(PmUser user, string role)
     {
-        
     }
 }
