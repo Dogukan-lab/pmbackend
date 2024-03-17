@@ -43,14 +43,19 @@ namespace pmbackend
             m_services.AddSwaggerGen();
 
             //Adding automapper for mapping DTO's to actual models.
-            m_services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            m_services.AddAutoMapper(typeof(Mapper.MapProfile));
 
+            m_services.AddScoped<IPmUserRepository, PmUserRepository>();
+            
             //Adding authentication for user login
             m_services.AddIdentity<PmUser, IdentityRole<int>>(
                 options =>
                 {
                     //Identity requirement options
                     options.Password.RequiredLength = 5;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
                 })
                 .AddEntityFrameworkStores<PaleMessengerContext>()
                 .AddDefaultTokenProviders();

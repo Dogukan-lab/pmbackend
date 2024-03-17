@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using pmbackend.Models;
 
 namespace pmbackend.Database
@@ -13,6 +14,10 @@ namespace pmbackend.Database
     public class PaleMessengerContext : IdentityDbContext<PmUser, IdentityRole<int>, int>
     {
         public PaleMessengerContext(DbContextOptions<PaleMessengerContext> option) : base(option)
+        {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
         }
 

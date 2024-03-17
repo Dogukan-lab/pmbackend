@@ -14,7 +14,9 @@ configurator.BuildServices();
 builder.Services.AddDbContext<PaleMessengerContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("pmuser");
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    options
+        .UseMySql(connectionString, ServerVersion.AutoDetect
+        (connectionString));
 });
 
 var app = builder.Build();

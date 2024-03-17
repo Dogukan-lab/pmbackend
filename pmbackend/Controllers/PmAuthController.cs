@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using pmbackend.Models;
 using pmbackend.Models.Dto;
 
 namespace pmbackend.Controllers
@@ -13,33 +15,41 @@ namespace pmbackend.Controllers
         /// </summary>
         private readonly IAuthService _authService;
 
-        private readonly AutoMapper _autoMapper;
+        private readonly IPmUserRepository _userRepository;
 
-        public PmAuthController(IAuthService authService, AutoMapper mapper)
+        private readonly IMapper _mapper;
+
+        public PmAuthController(IAuthService authService, IMapper mapper,
+            IPmUserRepository pmUserRepository)
         {
             _authService = authService;
-            _autoMapper = mapper;
+            _mapper = mapper;
+            _userRepository = pmUserRepository;
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> RegisterUser(PmUserDto pmUserDTO)
-        {   
-            if(!ModelState.IsValid)
+        public async Task<IActionResult> RegisterUser(PmLoginDto pmLogin)
+        {
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if(await _authService.RegisterUser(pmUserDTO))
+            if (await _authService.RegisterUser(pmLogin))
             {
-                return Ok($"Register user: {pmUserDTO.Username}");
+                var user =
+                    _mapper.Map<PmUserDto>(
+                        _authService.GetUser(pmLogin.Username));
+
+                var token = _authService.GenerateTokenString(pmLogin);
+                return Ok(new { token, user });
             }
 
-            return BadRequest("User has not been Registered!");  
-
+            return BadRequest("User has not been Registered!");
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> LoginUser(PmUserDto pmUser)
+        public async Task<IActionResult> LoginUser(PmLoginDto pmUser)
         {
             if (!ModelState.IsValid)
             {
@@ -47,14 +57,15 @@ namespace pmbackend.Controllers
             }
 
             var result = await _authService.Login(pmUser);
-            if(!result)
+            if (!result)
             {
                 return BadRequest("No proper user credentials!");
             }
 
-            var user = new PmUserDto();
+            var user =
+                _mapper.Map<PmUserDto>(_authService.GetUser(pmUser.Username));
             var tokenString = _authService.GenerateTokenString(pmUser);
-            return Ok(new {tokenString, pmUser});
+            return Ok(new { tokenString, user });
         }
 
         //Old Version
@@ -82,6 +93,5 @@ namespace pmbackend.Controllers
         //    //    ? Ok()
         //    //    : BadRequest("Incorrect");
         //}
-
     }
 }
