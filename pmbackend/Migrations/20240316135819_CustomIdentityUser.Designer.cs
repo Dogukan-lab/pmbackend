@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pmbackend.Database;
 
@@ -10,9 +11,11 @@ using pmbackend.Database;
 namespace pmbackend.Migrations
 {
     [DbContext(typeof(PaleMessengerContext))]
-    partial class PaleMessengerContextModelSnapshot : ModelSnapshot
+    [Migration("20240316135819_CustomIdentityUser")]
+    partial class CustomIdentityUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

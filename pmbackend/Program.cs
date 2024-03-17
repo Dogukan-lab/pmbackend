@@ -1,18 +1,16 @@
-using Microsoft.EntityFrameworkCore;
 using pmbackend;
 using pmbackend.Database;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+Configurator configurator = new Configurator(builder.Services, builder);
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddTransient<IAuthService, AuthenticationService>();
 
-//Setup database
+configurator.BuildServices();
+
 builder.Services.AddDbContext<PaleMessengerContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("pmuser");
@@ -21,7 +19,8 @@ builder.Services.AddDbContext<PaleMessengerContext>(options =>
 
 var app = builder.Build();
 
-//SeedDb.SeedDatabase(app);
+/*Needed for later */
+SeedDb.SeedUserIdentities(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -30,10 +29,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+//Configures all capabilities of application
+configurator.ConfigureApp(app);
 
 app.Run();

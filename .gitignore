@@ -10,6 +10,22 @@
 *.userosscache
 *.sln.docstates
 
+/shelf/
+/workspace.xml
+# Rider ignored files
+/.idea.pmbackend.iml
+/modules.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+/.idea.pmbackend/.idea/workspace.xml
+
+
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -396,3 +412,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+.idea/.idea.pmbackend/.idea/workspace.xml
