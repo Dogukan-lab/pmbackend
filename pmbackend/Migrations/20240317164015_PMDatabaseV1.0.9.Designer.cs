@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using pmbackend.Database;
 
@@ -10,9 +11,11 @@ using pmbackend.Database;
 namespace pmbackend.Migrations
 {
     [DbContext(typeof(PaleMessengerContext))]
-    partial class PaleMessengerContextModelSnapshot : ModelSnapshot
+    [Migration("20240317164015_PMDatabaseV1.0.9")]
+    partial class PMDatabaseV109
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,21 +148,6 @@ namespace pmbackend.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("UserFriend", b =>
-                {
-                    b.Property<int>("FriendsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PmUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("FriendsId", "PmUserId");
-
-                    b.HasIndex("PmUserId");
-
-                    b.ToTable("UserFriend");
-                });
-
             modelBuilder.Entity("pmbackend.Models.PmUser", b =>
                 {
                     b.Property<int>("Id")
@@ -181,9 +169,6 @@ namespace pmbackend.Migrations
                         .HasColumnType("varchar(256)");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<bool>("IsOnline")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -213,10 +198,6 @@ namespace pmbackend.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -289,19 +270,18 @@ namespace pmbackend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("UserFriend", b =>
+            modelBuilder.Entity("pmbackend.Models.PmUser", b =>
                 {
                     b.HasOne("pmbackend.Models.PmUser", null)
-                        .WithMany()
-                        .HasForeignKey("FriendsId")
+                        .WithMany("Friends")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.HasOne("pmbackend.Models.PmUser", null)
-                        .WithMany()
-                        .HasForeignKey("PmUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            modelBuilder.Entity("pmbackend.Models.PmUser", b =>
+                {
+                    b.Navigation("Friends");
                 });
 #pragma warning restore 612, 618
         }

@@ -30,19 +30,32 @@ namespace pmbackend
             //Adding controllers to do HTTP Requests with.
             m_services.AddControllers();
 
+            //Add policy
+            m_services.AddCors(options => options.AddPolicy("CorsPolicy", policyBuilder =>
+            {
+                policyBuilder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            }));
+            
             //Swagger for debugging
             m_services.AddEndpointsApiExplorer();
             m_services.AddSwaggerGen();
 
             //Adding automapper for mapping DTO's to actual models.
-            m_services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            m_services.AddAutoMapper(typeof(Mapper.MapProfile));
 
+            m_services.AddScoped<IPmUserRepository, PmUserRepository>();
+            
             //Adding authentication for user login
             m_services.AddIdentity<PmUser, IdentityRole<int>>(
                 options =>
                 {
                     //Identity requirement options
                     options.Password.RequiredLength = 5;
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
                 })
                 .AddEntityFrameworkStores<PaleMessengerContext>()
                 .AddDefaultTokenProviders();
@@ -70,6 +83,7 @@ namespace pmbackend
         public void ConfigureApp(WebApplication app)
         {
             app.UseHttpsRedirection();
+            app.UseCors("CorsPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

@@ -8,9 +8,11 @@ namespace pmbackend
     /// </summary>
     public interface IAuthService
     {
-        Task<bool> Login(PmUserDto pmUser);
-        Task<bool> RegisterUser(PmUserDto pmUser);
-        string GenerateTokenString(PmUserDto pmUser);
+        Task<bool> Login(PmLoginDto pmLogin);
+        Task<bool> RegisterUser(PmLoginDto pmLogin);
+        string GenerateTokenString(PmLoginDto pmUser);
+
+        PmUser GetUser(string userName);
         Task<ErrorTypes.ErrorType> DeleteUser(string claim, string username);
     }
 }

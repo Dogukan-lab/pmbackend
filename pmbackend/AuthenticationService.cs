@@ -6,6 +6,7 @@ using pmbackend.Models.Dto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using pmbackend.Database;
 using pmbackend.ErrorTypes;
 
 namespace pmbackend
@@ -19,25 +20,30 @@ namespace pmbackend
 
         private readonly UserManager<PmUser> _userManager;
         private readonly IConfiguration _configuration;
-        public AuthenticationService(UserManager<PmUser> userManager, IConfiguration configuration) {  _userManager = userManager; _configuration = configuration; }
+        private readonly PaleMessengerContext _context;
+        public AuthenticationService(UserManager<PmUser> userManager, 
+            IConfiguration configuration, PaleMessengerContext messengerContext) {  
+            _userManager = userManager; 
+            _configuration = configuration;
+            _context = messengerContext;
+        }
 
         /// <summary>
         /// This function registers the user through morphing it into an identitUser data class
         /// The identityUser class is used by Entityframework to make code-first implementations for database interaction.
         /// </summary>
-        /// <param name="pmUser">The user that is registering</param>
+        /// <param name="pmLogin">The user that is registering</param>
         /// <returns>A result depending on if the user is added or not</returns>
-        public async Task<bool> RegisterUser(PmUserDto pmUser)
+        public async Task<bool> RegisterUser(PmLoginDto pmLogin)
         {
-            var hashedPW = BCrypt.Net.BCrypt.EnhancedHashPassword(pmUser.Password);
-
+            // var hashedPW = BCrypt.Net.BCrypt.EnhancedHashPassword(pmLogin.Password);
             var identityUser = new PmUser    
             {
-                UserName = pmUser.Username,
-                Email = pmUser.Username
+                UserName = pmLogin.Username,
+                Email = pmLogin.Username
             };
 
-            var result = await _userManager.CreateAsync(identityUser, pmUser.Password);
+            var result = await _userManager.CreateAsync(identityUser, pmLogin.Password);
 
             return result.Succeeded;
         }
@@ -46,18 +52,18 @@ namespace pmbackend
         /// Function used for logging a user in.
         /// If a user has logged in, then a token gets created to go along with him.
         /// </summary>
-        /// <param name="pmUser">User that is logging in</param>
+        /// <param name="pmLogin">User that is logging in</param>
         /// <returns>A result to check if the credentials are correct.</returns>
-        public async Task<bool> Login(PmUserDto pmUser)
+        public async Task<bool> Login(PmLoginDto pmLogin)
         {
-            var user = await _userManager.FindByNameAsync(pmUser.Username);
+            var user = await _userManager.FindByNameAsync(pmLogin.Username);
            
             if (user is null)
             {
                 return false;
             }
 
-            return await _userManager.CheckPasswordAsync(user, pmUser.Password);
+            return await _userManager.CheckPasswordAsync(user, pmLogin.Password);
         }
 
         /// <summary>
@@ -71,12 +77,13 @@ namespace pmbackend
         /// </summary>
         /// <param name="pmUser">The user to generate the token for</param>
         /// <returns>A JWT to use for authentication within the API</returns>
-        public string GenerateTokenString(PmUserDto pmUser)
+        public string GenerateTokenString(PmLoginDto pmLogin)
         {
             IEnumerable<Claim> customClaims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, pmUser.Username),
+                new Claim(ClaimTypes.Name, pmLogin.Username),
                 new Claim(ClaimTypes.Role, "User"),
+                // new Claim(ClaimTypes.)
             };
 
             
@@ -86,7 +93,7 @@ namespace pmbackend
 
             var securityToken = new JwtSecurityToken(
                 claims: customClaims,
-                expires: DateTime.Now.AddMinutes(10),
+                expires: DateTime.Now.AddDays(2),
                 issuer: _configuration.GetSection("Jwt:Issuer").Value,
                 audience: _configuration.GetSection("Jwt:Audience").Value,
                 signingCredentials: signingCredentials);
@@ -95,6 +102,16 @@ namespace pmbackend
 
             return tokenString; 
         }
+
+        public PmUser GetUser(string userName)
+        {
+            var foundUser = _userManager.FindByNameAsync(userName).GetAwaiter()
+                .GetResult();
+           _context.Entry(foundUser).Collection(u => u.Friends).Load();
+            
+            return foundUser;
+        }
+        
 
         /// <summary>
         /// Deletes a specified user, only with the proper 

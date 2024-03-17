@@ -14,7 +14,9 @@ configurator.BuildServices();
 builder.Services.AddDbContext<PaleMessengerContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("pmuser");
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+    options
+        .UseMySql(connectionString, ServerVersion.AutoDetect
+        (connectionString));
 });
 
 builder.Services.AddCors(options => options.AddPolicy("customPolicies",
@@ -28,7 +30,7 @@ builder.Services.AddCors(options => options.AddPolicy("customPolicies",
 var app = builder.Build();
 
 /*Needed for later */
-SeedDb.SeedUserIdentities(app);
+// SeedDb.SeedUserIdentities(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
