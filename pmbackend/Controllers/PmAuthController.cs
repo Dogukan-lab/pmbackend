@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using pmbackend.ErrorTypes;
 using pmbackend.Models;
 using pmbackend.Models.Dto;
 
@@ -7,6 +8,7 @@ namespace pmbackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    //TODO Create seperate controller for user interaction.
     public class PmAuthController : Controller
     {
         /// <summary>
@@ -35,17 +37,23 @@ namespace pmbackend.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (await _authService.RegisterUser(pmLogin))
+            switch (await _authService.RegisterUser(pmLogin))
             {
-                var user =
-                    _mapper.Map<PmUserDto>(
-                        _authService.GetUser(pmLogin.Username));
+                case ErrorType.VALID_USER:
+                    var user =
+                        _mapper.Map<PmUserDto>(
+                            _authService.GetUser(pmLogin.Username));
 
-                var token = _authService.GenerateTokenString(pmLogin);
-                return Ok(new { token, user });
+                    var token = _authService.GenerateTokenString(pmLogin);
+                    return Ok(new { token, user });
+
+                case ErrorType.USERNAME_INVALID_LENGTH:
+                    return BadRequest(
+                        "Username is shorter than the required length of 4 characters!");
+
+                default:
+                    return BadRequest("Unable to register user!");
             }
-
-            return BadRequest("User has not been Registered!");
         }
 
         [HttpPost("Login")]

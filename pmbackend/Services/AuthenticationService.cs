@@ -34,9 +34,14 @@ namespace pmbackend
         /// </summary>
         /// <param name="pmLogin">The user that is registering</param>
         /// <returns>A result depending on if the user is added or not</returns>
-        public async Task<bool> RegisterUser(PmLoginDto pmLogin)
+        public async Task<ErrorType> RegisterUser(PmLoginDto pmLogin)
         {
             // var hashedPW = BCrypt.Net.BCrypt.EnhancedHashPassword(pmLogin.Password);
+            if (pmLogin.Username.Length < 4)
+            {
+                return ErrorType.USERNAME_INVALID_LENGTH;
+            }
+            
             var identityUser = new PmUser    
             {
                 UserName = pmLogin.Username,
@@ -45,7 +50,7 @@ namespace pmbackend
 
             var result = await _userManager.CreateAsync(identityUser, pmLogin.Password);
 
-            return result.Succeeded;
+            return result.Succeeded ? ErrorType.VALID_USER : ErrorType.UNABLE_TO_REGISTER;
         }
 
         /// <summary>
@@ -57,7 +62,7 @@ namespace pmbackend
         public async Task<bool> Login(PmLoginDto pmLogin)
         {
             var user = await _userManager.FindByNameAsync(pmLogin.Username);
-           
+            
             if (user is null)
             {
                 return false;

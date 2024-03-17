@@ -1,4 +1,5 @@
-﻿using pmbackend.Models;
+﻿using pmbackend.ErrorTypes;
+using pmbackend.Models;
 using pmbackend.Models.Dto;
 
 namespace pmbackend
@@ -9,7 +10,7 @@ namespace pmbackend
     public interface IAuthService
     {
         Task<bool> Login(PmLoginDto pmLogin);
-        Task<bool> RegisterUser(PmLoginDto pmLogin);
+        Task<ErrorType> RegisterUser(PmLoginDto pmLogin);
         string GenerateTokenString(PmLoginDto pmUser);
 
         PmUser GetUser(string userName);

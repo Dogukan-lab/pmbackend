@@ -24,7 +24,7 @@ namespace pmbackend.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
+           
             modelBuilder.Entity<PmUser>(user =>
             {
                 user.HasMany(f => f.Friends)
