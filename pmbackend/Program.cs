@@ -17,6 +17,14 @@ builder.Services.AddDbContext<PaleMessengerContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
+builder.Services.AddCors(options => options.AddPolicy("customPolicies",
+    policyBuilder =>
+    {
+        policyBuilder.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    }));
+
 var app = builder.Build();
 
 /*Needed for later */
@@ -28,6 +36,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("customPolicies");
 
 //Configures all capabilities of application
 configurator.ConfigureApp(app);
