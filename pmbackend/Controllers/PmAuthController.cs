@@ -13,9 +13,12 @@ namespace pmbackend.Controllers
         /// </summary>
         private readonly IAuthService _authService;
 
-        public PmAuthController(IAuthService authService)
+        private readonly AutoMapper _autoMapper;
+
+        public PmAuthController(IAuthService authService, AutoMapper mapper)
         {
             _authService = authService;
+            _autoMapper = mapper;
         }
 
         [HttpPost("Register")]
@@ -49,8 +52,9 @@ namespace pmbackend.Controllers
                 return BadRequest("No proper user credentials!");
             }
 
+            var user = new PmUserDto();
             var tokenString = _authService.GenerateTokenString(pmUser);
-            return Ok(tokenString);
+            return Ok(new {tokenString, pmUser});
         }
 
         //Old Version

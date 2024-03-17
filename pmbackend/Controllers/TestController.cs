@@ -12,8 +12,7 @@ namespace pmbackend.Controllers
     [Authorize]
     public class TestController: ControllerBase
     {
-
-        public readonly IAuthService _authService;  
+        private readonly IAuthService _authService;  
 
         public TestController(IAuthService authService) { _authService = authService; }
 
@@ -35,7 +34,7 @@ namespace pmbackend.Controllers
         }
 
         [HttpPost("DeleteUser")]
-        public async Task<IActionResult> DeleteUrself(string username)
+        public async Task<IActionResult> DeleteUser(string username)
         { 
             //Searches for the role of the user that is trying to delete a target user from username
             var role = User.FindFirst(ClaimTypes.Role)?.Value;
