@@ -72,34 +72,8 @@ namespace pmbackend.Controllers
 
             var user =
                 _mapper.Map<PmUserDto>(_authService.GetUser(pmUser.Username));
-            var tokenString = _authService.GenerateTokenString(pmUser);
-            return Ok(new { tokenString, user });
+            var token = _authService.GenerateTokenString(pmUser);
+            return Ok(new { token, user });
         }
-
-        //Old Version
-        //[HttpPost]
-        //public IActionResult LoginRequest(PmUserDto userDTO)
-        //{
-
-        //    string passwordHash = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
-
-        //    var user = new PmUser();
-
-        //    user.Username = userDTO.Username;
-        //    user.PasswordHash = passwordHash;
-
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    return Ok();
-
-
-        //    //return _context.PmUsers.FirstOrDefault(compare => user.Username == compare.Username &&
-        //    //                                                  user.Password == compare.Password) != null
-        //    //    ? Ok()
-        //    //    : BadRequest("Incorrect");
-        //}
     }
 }

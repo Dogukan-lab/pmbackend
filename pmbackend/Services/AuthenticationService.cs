@@ -112,11 +112,10 @@ namespace pmbackend
         {
             var foundUser = _userManager.FindByNameAsync(userName).GetAwaiter()
                 .GetResult();
-           _context.Entry(foundUser).Collection(u => u.Friends).Load();
+           _context.Entry(foundUser).Collection(u => u.Friends!).Load();
             
             return foundUser;
         }
-        
 
         /// <summary>
         /// Deletes a specified user, only with the proper 

@@ -8,6 +8,7 @@ namespace pmbackend.Models
         public override int Id { get; set; }
         public int ProfileIcon { get; set; } = 0;
         public int Background { get; set; } = 0;
+        public string Bio { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public bool IsOnline { get; set; } = true;
         
