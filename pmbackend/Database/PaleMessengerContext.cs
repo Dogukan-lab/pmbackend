@@ -19,6 +19,8 @@ namespace pmbackend.Database
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            // base.OnConfiguring(optionsBuilder);
+            // optionsBuilder.UseLazyLoadingProxies().UseChangeTrackingProxies();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

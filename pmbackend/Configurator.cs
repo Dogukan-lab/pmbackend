@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using pmbackend.Database;
 using System.Text;
+using Microsoft.OpenApi.Models;
 using pmbackend.Models;
 
 namespace pmbackend
@@ -18,6 +19,7 @@ namespace pmbackend
     {
         public IServiceCollection m_services;
         public WebApplicationBuilder m_configBuilder;
+
         public Configurator(IServiceCollection services,
             WebApplicationBuilder configBuilder)
         {
@@ -37,33 +39,57 @@ namespace pmbackend
                     .AllowAnyHeader()
                     .AllowAnyMethod();
             }));
-            
+
             //Swagger for debugging
             m_services.AddEndpointsApiExplorer();
-            m_services.AddSwaggerGen();
+            m_services.AddSwaggerGen(config =>
+            {
+                config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme.",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer"
+                });
+                config.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+            });
 
             //Adding automapper for mapping DTO's to actual models.
             m_services.AddAutoMapper(typeof(Mapper.MapProfile));
 
             m_services.AddScoped<IPmUserRepository, PmUserRepository>();
-            
+
             //Adding authentication for user login
             m_services.AddIdentity<PmUser, IdentityRole<int>>(
-                options =>
-                {
-                    //Identity requirement options
-                    options.Password.RequiredLength = 5;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                })
+                    options =>
+                    {
+                        //Identity requirement options
+                        options.Password.RequiredLength = 5;
+                        options.Password.RequireDigit = false;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequireNonAlphanumeric = false;
+                    })
                 .AddEntityFrameworkStores<PaleMessengerContext>()
                 .AddDefaultTokenProviders();
             m_services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
+                {
+                    options.DefaultAuthenticateScheme =
+                        JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme =
+                        JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters()
@@ -73,9 +99,13 @@ namespace pmbackend
                         ValidateAudience = true,
                         RequireExpirationTime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = m_configBuilder.Configuration.GetSection("Jwt:Issuer").Value,
-                        ValidAudience = m_configBuilder.Configuration.GetSection("Jwt:Audience").Value,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(m_configBuilder.Configuration.GetSection("Jwt:Key").Value))
+                        ValidIssuer = m_configBuilder.Configuration
+                            .GetSection("Jwt:Issuer").Value,
+                        ValidAudience = m_configBuilder.Configuration
+                            .GetSection("Jwt:Audience").Value,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(m_configBuilder.Configuration
+                                .GetSection("Jwt:Key").Value))
                     };
                 });
         }

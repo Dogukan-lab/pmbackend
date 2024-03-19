@@ -13,8 +13,7 @@ namespace pmbackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //TODO In production re-enable this, for testing no need to authorize
-    // [Authorize]
+    [Authorize]
     public class PmUserController : Controller
     {
         private readonly IPmUserRepository _userRepository;
@@ -43,7 +42,7 @@ namespace pmbackend.Controllers
             {
                 return Ok(list);
             }
-            
+
             var newList = list.FindAll(usr => usr.Username.ToLower().Contains
                 (searchTarget!.ToLower()));
 
@@ -53,14 +52,8 @@ namespace pmbackend.Controllers
         [HttpGet("GetUser")]
         public IActionResult GetUser(string username)
         {
-            //TODO reset Auth to handle this.
-            // if (username == User.FindFirst(ClaimTypes.Name)!.Value)
-            // {
-            // return BadRequest("You can't type in your own name, damnit!");
-            // }
             var user =
-                _mapper.Map<PmUserDto>(_userManager.FindByNameAsync(username)
-                    .GetAwaiter().GetResult());
+                _mapper.Map<PmUserDto>(_userRepository.GetUser(username));
 
             if (user is null)
                 return BadRequest("User has not been found!");
@@ -69,18 +62,20 @@ namespace pmbackend.Controllers
         }
 
         [HttpPost("UpdateUser")]
-        public IActionResult UpdateUser(string username, PmUserDto user)
+        public IActionResult UpdateUser(PmUserDto user)
         {
+            var username = User.FindFirst(ClaimTypes.Name)?.Value;
+
             //TODO When updating the token should be enough to identify the user that is being updated!
             var userToUpdate = _userManager.FindByNameAsync(username).GetAwaiter()
                 .GetResult();
-            
+
             if (userToUpdate is null)
                 return NotFound();
 
             //Map User data from and to the user to update
             _mapper.Map(user, userToUpdate);
-            
+
             return _userManager.UpdateAsync(userToUpdate).GetAwaiter().GetResult()
                 .Succeeded
                 ? Ok("User has been updated!")
@@ -88,9 +83,12 @@ namespace pmbackend.Controllers
         }
 
         [HttpPost("AddFriend")]
-        public IActionResult AddFriend(string username, string targetUser)
+        public IActionResult AddFriend(string targetUser)
         {
-            var error = _userRepository.AddFriend(username, targetUser);
+            var username = User.FindFirst(ClaimTypes.Name)?.Value;
+
+
+            var error = _userRepository.AddFriend(username!, targetUser);
             if (error is ErrorType.USER_NOT_FOUND)
             {
                 return BadRequest("User has not been added to the list!");
@@ -100,9 +98,13 @@ namespace pmbackend.Controllers
         }
 
         [HttpPost("RemoveFriend")]
-        public IActionResult RemoveFriend(string username, string targetUser)
+        public IActionResult RemoveFriend(string targetUser)
         {
-            var error = _userRepository.RemoveFriend(username, targetUser);
+            var username = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (username.IsNullOrEmpty())
+                return BadRequest("Username has not been found!");
+
+            var error = _userRepository.RemoveFriend(username!, targetUser);
             if (error is ErrorType.USER_NOT_FOUND)
             {
                 return BadRequest("User has not been found to delete!");
