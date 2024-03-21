@@ -4,7 +4,7 @@ using pmbackend.Models;
 
 namespace pmbackend;
 
-public class ChatRepository: IChatRepository
+public class ChatRepository : IChatRepository
 {
     private readonly PaleMessengerContext _messengerContext;
 
@@ -30,7 +30,10 @@ public class ChatRepository: IChatRepository
 
     public bool AddMessageToChat(int id, Message message)
     {
-        var chat = _messengerContext.Chats.FirstOrDefault(res => res.ChatId == id);
+        var chat = _messengerContext.Chats
+            .Include(chat => chat.Messages)
+            .Include(chat => chat.Users)
+            .FirstOrDefault(res => res.ChatId == id);
         chat?.Messages?.Add(message);
 
         return _messengerContext.SaveChangesAsync().GetAwaiter().GetResult() > 0;

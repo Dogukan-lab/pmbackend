@@ -106,7 +106,7 @@ namespace pmbackend
                             .GetSection("Jwt:Audience").Value,
                         IssuerSigningKey = new SymmetricSecurityKey(
                             Encoding.UTF8.GetBytes(m_configBuilder.Configuration
-                                .GetSection("Jwt:Key").Value))
+                                .GetSection("Jwt:Key").Value!))
                     };
                 });
         }
