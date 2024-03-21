@@ -39,7 +39,7 @@ public class ChatController : Controller
             .FindByNameAsync(User.FindFirst(ClaimTypes.Name)!.Value)
             .GetAwaiter().GetResult();
 
-        var chats = _chatRepository.GetChatsForUser(user);
+        var chats = _mapper.Map<List<ChatDto>>(_chatRepository.GetChatsForUser(user));
 
         return Ok(chats);
     }
