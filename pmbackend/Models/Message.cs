@@ -14,6 +14,6 @@ public class Message
    public string Data { get; set; } = string.Empty;
    public DateTime TimeStamp { get; set; }
    
-   public virtual Chat Chat { get; set; }
-   public virtual PmUser User { get; set; }
+   public virtual Chat? Chat { get; set; }
+   public virtual PmUser? User { get; set; }
 }

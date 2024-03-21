@@ -70,6 +70,7 @@ namespace pmbackend
             m_services.AddAutoMapper(typeof(Mapper.MapProfile));
 
             m_services.AddScoped<IPmUserRepository, PmUserRepository>();
+            m_services.AddScoped<IChatRepository, ChatRepository>();
 
             //Adding authentication for user login
             m_services.AddIdentity<PmUser, IdentityRole<int>>(
