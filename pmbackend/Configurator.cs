@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using pmbackend.Database;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using pmbackend.Hub;
 using pmbackend.Models;
 
 namespace pmbackend
@@ -61,7 +62,7 @@ namespace pmbackend
                                 Id = "Bearer"
                             }
                         },
-                        new string[] {}
+                        new string[] { }
                     }
                 });
             });
@@ -109,15 +110,21 @@ namespace pmbackend
                                 .GetSection("Jwt:Key").Value))
                     };
                 });
-        }
+            m_services.AddLogging(builder =>
+            {
+                builder.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+            });        }
 
         public void ConfigureApp(WebApplication app)
         {
             app.UseHttpsRedirection();
             app.UseCors("CorsPolicy");
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+
+            app.UseEndpoints(endpoints => { endpoints.MapHub<ChatHub>("/chatHub"); });
         }
     }
 }
