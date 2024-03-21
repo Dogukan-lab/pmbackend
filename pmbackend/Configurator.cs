@@ -7,6 +7,7 @@ using pmbackend.Database;
 using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
+using pmbackend.Hub;
 using pmbackend.Models;
 
 namespace pmbackend
@@ -66,7 +67,7 @@ namespace pmbackend
                                 Id = "Bearer"
                             }
                         },
-                        new string[] {}
+                        new string[] { }
                     }
                 });
             });
@@ -113,17 +114,45 @@ namespace pmbackend
                             Encoding.UTF8.GetBytes(m_configBuilder.Configuration
                                 .GetSection("Jwt:Key").Value!))
                     };
+
                     
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // If the request is for our hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/chatHub")))
+                            {
+                                // Read the token out of the query string
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+
                 });
+            
+            m_services.AddLogging(builder =>
+            {
+                builder.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+            });
         }
 
         public void ConfigureApp(WebApplication app)
         {
             app.UseHttpsRedirection();
             app.UseCors("CorsPolicy");
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+
+            app.UseEndpoints(endpoints => { endpoints.MapHub<ChatHub>("/chatHub"); });
         }
     }
 }
