@@ -11,6 +11,8 @@ builder.Services.AddTransient<IAuthService, AuthenticationService>();
 
 configurator.BuildServices();
 
+builder.Services.AddSignalR();
+
 builder.Services.AddDbContext<PaleMessengerContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("pmuser");
@@ -18,14 +20,6 @@ builder.Services.AddDbContext<PaleMessengerContext>(options =>
         .UseMySql(connectionString, ServerVersion.AutoDetect
         (connectionString));
 });
-
-builder.Services.AddCors(options => options.AddPolicy("customPolicies",
-    policyBuilder =>
-    {
-        policyBuilder.AllowAnyOrigin()
-            .AllowAnyMethod()
-            .AllowAnyHeader();
-    }));
 
 var app = builder.Build();
 
@@ -38,8 +32,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseCors("customPolicies");
 
 //Configures all capabilities of application
 configurator.ConfigureApp(app);
