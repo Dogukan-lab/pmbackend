@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
+using Microsoft.IdentityModel.Abstractions;
 using pmbackend.Models;
 
 namespace pmbackend.Database
@@ -16,12 +17,15 @@ namespace pmbackend.Database
         public PaleMessengerContext(DbContextOptions<PaleMessengerContext> option) : base(option)
         {
         }
+        
+        public DbSet<Chat> Chats { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            // base.OnConfiguring(optionsBuilder);
-            // optionsBuilder.UseLazyLoadingProxies().UseChangeTrackingProxies();
-        }
+        // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        // {
+        //     base.OnConfiguring(optionsBuilder);
+        //     optionsBuilder.UseLazyLoadingProxies().UseChangeTrackingProxies();
+        // }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +40,11 @@ namespace pmbackend.Database
                         j => j.HasOne<PmUser>().WithMany()
                     );
             });
+
+            modelBuilder.Entity<PmUser>()
+                .HasMany(user => user.Chats)
+                .WithMany(chat => chat.Users)
+                .UsingEntity(jointbl => jointbl.ToTable("PmUserChat"));
         }
     }
 }

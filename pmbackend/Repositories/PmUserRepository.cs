@@ -36,10 +36,8 @@ public class PmUserRepository : IPmUserRepository
     public PmUser? GetUser(string username)
     {
         var user = _manager.FindByNameAsync(username).GetAwaiter().GetResult();
-        
-        if(user is not null) 
-            _context.Entry(user).Collection(u => u.Friends!).Load();
-
+        // if(user is not null) 
+            // _context.Entry(user).Collection(u => u.Friends!).Load();
         return user;
     }
 

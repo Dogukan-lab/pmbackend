@@ -14,5 +14,6 @@ namespace pmbackend.Models
         
         //TODO Figure something out to fix this mess.
         public virtual ICollection<PmUser>? Friends { get; set; }
+        public virtual ICollection<Chat>? Chats { get; set; }
     }
 }
