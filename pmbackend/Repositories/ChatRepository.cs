@@ -34,7 +34,13 @@ public class ChatRepository : IChatRepository
             .Include(chat => chat.Messages)
             .Include(chat => chat.Users)
             .FirstOrDefault(res => res.ChatId == id);
-        chat?.Messages?.Add(message);
+
+        if (chat is null)
+        {
+            return false;
+        }
+        
+        chat.Messages?.Add(message);
 
         return _messengerContext.SaveChangesAsync().GetAwaiter().GetResult() > 0;
     }
@@ -43,8 +49,13 @@ public class ChatRepository : IChatRepository
     {
         return _messengerContext.Chats
             .Include(chats => chats.Users)
-            .Include(chats => chats.Messages)
             .ToList();
+    }
+
+    public List<Chat> GetChatsForUser(PmUser user)
+    {
+        return _messengerContext.Chats.Include(chat => chat.Users)
+            .Where(chat => chat.Users!.Any(usr => usr.Id == user.Id)).ToList();
     }
 
     public Chat GetChat(int id)
@@ -52,6 +63,15 @@ public class ChatRepository : IChatRepository
         return _messengerContext.Chats.Include(chats => chats.Users)
             .Include(chats => chats.Messages)
             .FirstOrDefault(res => res.ChatId == id)!;
+    }
+
+    public int GetChatId(string username)
+    {
+        throw new NotImplementedException();
+        // return _messengerContext.Chats
+        //     .Include(chat => chat.Users)
+        //     .Include(chat => chat.Messages)
+        //     .Where(res => res.Users.Contains(username) && res.Users.Contains(secondUser));
     }
 
     public Task<bool> HideChat()

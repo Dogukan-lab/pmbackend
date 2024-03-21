@@ -32,6 +32,18 @@ public class ChatController : Controller
         return Ok(chats);
     }
 
+    [HttpGet("UserChats")]
+    public IActionResult GetAllUserChats()
+    {
+        var user = _userManager
+            .FindByNameAsync(User.FindFirst(ClaimTypes.Name)!.Value)
+            .GetAwaiter().GetResult();
+
+        var chats = _chatRepository.GetChatsForUser(user);
+
+        return Ok(chats);
+    }
+
     //TODO When there is no chat create one instead.
     [HttpGet("Chat")]
     public IActionResult GetChat(int id)
@@ -42,16 +54,35 @@ public class ChatController : Controller
 
 
     [HttpPost("SendMessage")]
-    public IActionResult SendMessageToChat(int id,MessageDto incomingMsg)
-    {
-        var msg = _mapper.Map<Message>(incomingMsg);
 
-        if (!_chatRepository.AddMessageToChat(id, msg))
-        {
-            return BadRequest("Message not added to DB!");
-        }
+    //TODO Fix this?
+    //Needs to be done through usernames only.
+    public IActionResult SendMessageToChat(MessageDto incomingMsg, string targetUsername)
+    {
+        var username = User.FindFirst(ClaimTypes.Name)?.Value;
+        var user = _userManager.FindByNameAsync(username).GetAwaiter().GetResult();
+        var trgt = _userManager.FindByNameAsync(targetUsername).GetAwaiter().GetResult();
+
+        var msg = _mapper.Map<Message>(incomingMsg);
         
-        return Ok("MESSAGE ADDED TO DATABASE!");
+        if (_chatRepository.AddMessageToChat(incomingMsg.ChatId, msg))
+            return Ok("MESSAGE ADDED TO DATABASE!");
+        
+        //Create chat 
+        var chat = new Chat
+        {
+            IsVisible = true,
+            Messages = new List<Message> { msg },
+            Users = new List<PmUser> { user, trgt }
+        };
+
+        if (_chatRepository.AddChat(chat))
+        {
+            return Ok(_mapper.Map<ChatDto>(chat));
+        }
+
+        return BadRequest("Request could not be parsed!");
+        //Do nothing and append to db as entry.
     }
 
     [HttpPost("CreateChat")]

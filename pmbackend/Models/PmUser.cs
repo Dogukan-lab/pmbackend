@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 
 namespace pmbackend.Models
 {
@@ -13,7 +14,9 @@ namespace pmbackend.Models
         public bool IsOnline { get; set; } = true;
         
         //TODO Figure something out to fix this mess.
+        [JsonIgnore]
         public virtual ICollection<PmUser>? Friends { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Chat>? Chats { get; set; }
     }
 }

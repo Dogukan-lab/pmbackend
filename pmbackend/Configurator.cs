@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using pmbackend.Database;
 using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using pmbackend.Models;
 
@@ -30,7 +31,11 @@ namespace pmbackend
         public void BuildServices()
         {
             //Adding controllers to do HTTP Requests with.
-            m_services.AddControllers();
+            m_services.AddControllers().AddJsonOptions(
+                options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                });
 
             //Add policy
             m_services.AddCors(options => options.AddPolicy("CorsPolicy", policyBuilder =>
