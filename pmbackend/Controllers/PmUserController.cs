@@ -112,19 +112,5 @@ namespace pmbackend.Controllers
 
             return Ok("Friend Successfully removed!");
         }
-
-        [HttpPost("SetOnline")]
-        public IActionResult SetOnline(bool online)
-        {
-            var user = _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.Name)?.Value)
-                .GetAwaiter().GetResult();
-
-            if (user is null) return NotFound();
-
-            user.IsOnline = online;
-            return _userManager.UpdateAsync(user).GetAwaiter().GetResult().Succeeded
-                ? Ok("isOnline successfully updated")
-                : BadRequest("Error while updating isOnline");
-        }
     }
 }

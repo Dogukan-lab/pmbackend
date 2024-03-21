@@ -109,11 +109,30 @@ namespace pmbackend
                             Encoding.UTF8.GetBytes(m_configBuilder.Configuration
                                 .GetSection("Jwt:Key").Value))
                     };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // If the request is for our hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/chatHub")))
+                            {
+                                // Read the token out of the query string
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
+            
             m_services.AddLogging(builder =>
             {
                 builder.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
-            });        }
+            });
+        }
 
         public void ConfigureApp(WebApplication app)
         {
