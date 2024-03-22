@@ -10,9 +10,10 @@ namespace pmbackend.Mapper
     {
         public MapProfile()
         {
-            CreateMap<PmUser, PmUserDto>().ReverseMap();
+            CreateMap<PmUser, PmUserDto>();
+            CreateMap<PmUserDto, PmUser>().ForMember(dst => dst.Id, opt => opt.Ignore());
             CreateMap<Chat, ChatDto>().ReverseMap();
-            CreateMap<Message, MessageDto>().ForMember(dest => dest.UserName, opt => 
+            CreateMap<Message, MessageDto>().ForMember(dest => dest.UserName, opt =>
                 opt.MapFrom(src => src.User!.UserName)).ReverseMap();
         }
     }
