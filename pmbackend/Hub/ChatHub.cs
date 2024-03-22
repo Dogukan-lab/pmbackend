@@ -26,7 +26,7 @@ public class ChatHub : Microsoft.AspNetCore.SignalR.Hub
         user.IsOnline = true;
         _userManager.UpdateAsync(user).GetAwaiter().GetResult();
 
-        Clients.All.SendAsync("ReceivePing", "*");
+        Clients.Others.SendAsync("ReceivePing", "*", user.UserName);
 
         return base.OnConnectedAsync();
     }
@@ -41,11 +41,11 @@ public class ChatHub : Microsoft.AspNetCore.SignalR.Hub
         user.IsOnline = false;
         _userManager.UpdateAsync(user).GetAwaiter().GetResult();
 
-        Clients.All.SendAsync("ReceivePing", "*");
+        Clients.Others.SendAsync("ReceivePing", "*", user.UserName);
 
         return base.OnDisconnectedAsync(exception);
     }
 
     public async Task PingUser(string user) =>
-        await Clients.All.SendAsync("ReceivePing", user);
+        await Clients.Others.SendAsync("ReceivePing", user);
 }
