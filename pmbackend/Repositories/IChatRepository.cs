@@ -11,6 +11,6 @@ public interface IChatRepository
     int GetChatId(string username);
     Task<bool> HideChat();
     bool UpdateChat(Chat newChat);
-    public bool AddMessageToChat(int id, Message message);
+    public bool AddMessageToChat(string username, string targetUser, Message message);
     public bool AddUserToChat(int id, PmUser user);
 }

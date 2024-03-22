@@ -53,19 +53,23 @@ public class ChatController : Controller
     }
 
 
+    /**
+     * @brief Sends a message to the chat, if no chat exists creates a new chat in the db.
+     * @param incomingMsg, Message that the current user calling the API uses.
+     * @param targetUsername, The target user to where the message is being sent
+     */
     [HttpPost("SendMessage")]
-
-    //TODO Fix this?
-    //Needs to be done through usernames only.
     public IActionResult SendMessageToChat(MessageDto incomingMsg, string targetUsername)
     {
+        //Finds yourself, and the targeted user.
         var username = User.FindFirst(ClaimTypes.Name)?.Value;
         var user = _userManager.FindByNameAsync(username).GetAwaiter().GetResult();
         var trgt = _userManager.FindByNameAsync(targetUsername).GetAwaiter().GetResult();
 
         var msg = _mapper.Map<Message>(incomingMsg);
+        msg.User = user;
         
-        if (_chatRepository.AddMessageToChat(incomingMsg.ChatId, msg))
+        if (_chatRepository.AddMessageToChat(username, targetUsername, msg))
             return Ok("MESSAGE ADDED TO DATABASE!");
         
         //Create chat 
