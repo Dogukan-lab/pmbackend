@@ -10,10 +10,12 @@ namespace pmbackend.Hub;
 public class ChatHub : Microsoft.AspNetCore.SignalR.Hub
 {
     private readonly UserManager<PmUser> _userManager;
+    private readonly IChatRepository _chatRepository;
 
-    public ChatHub(UserManager<PmUser> manager)
+    public ChatHub(UserManager<PmUser> manager, IChatRepository chatRepository)
     {
         _userManager = manager;
+        _chatRepository = chatRepository;
     }
 
     public override Task OnConnectedAsync()

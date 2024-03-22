@@ -49,12 +49,14 @@ public class ChatRepository : IChatRepository
     {
         return _messengerContext.Chats
             .Include(chats => chats.Users)
+            .Include(chats => chats.Messages)
             .ToList();
     }
 
     public List<Chat> GetChatsForUser(PmUser user)
     {
         return _messengerContext.Chats.Include(chat => chat.Users)
+            .Include(chat => chat.Messages)
             .Where(chat => chat.Users!.Any(usr => usr.Id == user.Id)).ToList();
     }
 

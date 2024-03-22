@@ -413,3 +413,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 .idea/.idea.pmbackend/.idea/workspace.xml
+pmbackend/appsettings.json
