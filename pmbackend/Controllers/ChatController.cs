@@ -67,9 +67,10 @@ public class ChatController : Controller
         var trgt = _userManager.FindByNameAsync(targetUsername).GetAwaiter().GetResult();
 
         var msg = _mapper.Map<Message>(incomingMsg);
+        msg.TimeStamp = DateTime.Now.ToLocalTime();
         msg.User = user;
         
-        if (_chatRepository.AddMessageToChat(username, targetUsername, msg))
+        if (_chatRepository.AddMessageToChat(username!, targetUsername, msg))
             return Ok("MESSAGE ADDED TO DATABASE!");
         
         //Create chat 
