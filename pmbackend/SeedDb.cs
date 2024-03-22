@@ -91,6 +91,7 @@ public class SeedDb
         duncan.Friends = new List<PmUser> { lars, tester, };
         lars.Friends = new List<PmUser> { duncan, tester, owen };
         tester.Friends = new List<PmUser> { lars, duncan, };
+        owen.Friends = new List<PmUser> { lars, };
 
         //Update created entries
         userManager.UpdateAsync(duncan).GetAwaiter().GetResult();
@@ -111,13 +112,13 @@ public class SeedDb
                 new Message
                 {
                     Data = "Test message one",
-                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    TimeStamp = DateTime.Now.ToLocalTime().AddHours(-2),
                     User = duncan
                 },
                 new Message
                 {
                     Data = "10? Waarom 10?",
-                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    TimeStamp = DateTime.Now.ToLocalTime().AddHours(-1),
                     User = lars
                 },
                 new Message
@@ -137,7 +138,7 @@ public class SeedDb
                 new Message
                 {
                     Data = "Tester messaging Duncan",
-                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    TimeStamp = DateTime.Now.ToLocalTime().AddHours(-1),
                     User = tester
                 },
                 new Message
@@ -158,19 +159,19 @@ public class SeedDb
                 new Message
                 {
                     Data = "Yo OWEN!",
-                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    TimeStamp = DateTime.Now.ToLocalTime().AddHours(-3),
                     User = lars
                 },
                 new Message
                 {
                     Data = "Breh",
-                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    TimeStamp = DateTime.Now.ToLocalTime().AddHours(-2),
                     User = owen
                 },
                 new Message
                 {
                     Data = "No waying you're insane",
-                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    TimeStamp = DateTime.Now.ToLocalTime().AddHours(-1),
                     User = owen
                 },
                 new Message
