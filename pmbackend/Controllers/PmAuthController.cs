@@ -16,17 +16,12 @@ namespace pmbackend.Controllers
         /// The IAuthService handles registration, login and token generation
         /// </summary>
         private readonly IAuthService _authService;
-
-        private readonly IPmUserRepository _userRepository;
-
         private readonly IMapper _mapper;
 
-        public PmAuthController(IAuthService authService, IMapper mapper,
-            IPmUserRepository pmUserRepository)
+        public PmAuthController(IAuthService authService, IMapper mapper)
         {
             _authService = authService;
             _mapper = mapper;
-            _userRepository = pmUserRepository;
         }
 
         [HttpPost("Register")]
@@ -44,7 +39,7 @@ namespace pmbackend.Controllers
                         _mapper.Map<PmUserDto>(
                             _authService.GetUser(pmLogin.Username));
 
-                    var token = _authService.GenerateTokenString(pmLogin);
+                    var token = _authService.GenerateTokenString(pmLogin.Username);
                     return Ok(new { token, user });
 
                 case ErrorType.USERNAME_INVALID_LENGTH:
@@ -72,7 +67,7 @@ namespace pmbackend.Controllers
 
             var user =
                 _mapper.Map<PmUserDto>(_authService.GetUser(pmUser.Username));
-            var token = _authService.GenerateTokenString(pmUser);
+            var token = _authService.GenerateTokenString(pmUser.Username);
             return Ok(new { token, user });
         }
     }

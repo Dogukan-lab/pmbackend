@@ -11,7 +11,7 @@ namespace pmbackend
     {
         Task<ErrorType> RegisterUser(PmLoginDto pmLogin);
         Task<bool> Login(PmLoginDto pmLogin);
-        string GenerateTokenString(PmLoginDto pmUser);
+        string GenerateTokenString(string username);
 
         PmUser GetUser(string userName);
 

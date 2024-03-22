@@ -82,13 +82,12 @@ namespace pmbackend
         /// </summary>
         /// <param name="pmUser">The user to generate the token for</param>
         /// <returns>A JWT to use for authentication within the API</returns>
-        public string GenerateTokenString(PmLoginDto pmLogin)
+        public string GenerateTokenString(string username)
         {
             IEnumerable<Claim> customClaims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, pmLogin.Username),
-                new Claim(ClaimTypes.Role, "User"),
-                // new Claim(ClaimTypes.)
+                new (ClaimTypes.Name, username),
+                new (ClaimTypes.Role, "User"),
             };
 
             

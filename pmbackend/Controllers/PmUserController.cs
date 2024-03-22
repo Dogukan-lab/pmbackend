@@ -18,15 +18,18 @@ namespace pmbackend.Controllers
     {
         private readonly IPmUserRepository _userRepository;
         private readonly UserManager<PmUser> _userManager;
+        private readonly IAuthService _authService;
         private readonly IMapper _mapper;
 
         public PmUserController(IPmUserRepository userRepository, IMapper
                 mapper,
-            UserManager<PmUser> manager)
+            UserManager<PmUser> manager,
+            IAuthService authService)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _userManager = manager;
+            _authService = authService; 
         }
 
 
@@ -75,10 +78,10 @@ namespace pmbackend.Controllers
 
             //Map User data from and to the user to update
             _mapper.Map(user, userToUpdate);
-
-            return _userManager.UpdateAsync(userToUpdate).GetAwaiter().GetResult()
-                .Succeeded
-                ? Ok("User has been updated!")
+            bool succeeded= _userManager.UpdateAsync(userToUpdate).GetAwaiter().GetResult().Succeeded;
+            string token = _authService.GenerateTokenString(user.Username);
+                return succeeded
+                ? Ok(token)
                 : BadRequest("User has not been updated!");
         }
 
