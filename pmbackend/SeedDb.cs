@@ -48,19 +48,14 @@ public class SeedDb
         var context = serviceScope.ServiceProvider.GetService<PaleMessengerContext>();
 
         if (context is null)
-        {
-            //Maybe return an error instead of a raw return.
             return;
-        }
 
         if (context.Users.Any())
-        {
-            //Same here.
             return;
-        }
 
         //Create manager
-        var userManager = serviceScope.ServiceProvider.GetRequiredService<UserManager<PmUser>>();
+        var userManager =
+            serviceScope.ServiceProvider.GetRequiredService<UserManager<PmUser>>();
 
         //Setup users
         var duncan = new PmUser
@@ -81,27 +76,116 @@ public class SeedDb
             ProfileIcon = 1,
             Background = 0,
         };
-
+        var owen = new PmUser
+        {
+            UserName = "Owen",
+            ProfileIcon = 3,
+            Background = 1,
+        };
         userManager.CreateAsync(duncan, "Duncan#1").GetAwaiter().GetResult();
         userManager.CreateAsync(lars, "Lars#1").GetAwaiter().GetResult();
         userManager.CreateAsync(tester, "Tester#1").GetAwaiter().GetResult();
+        userManager.CreateAsync(owen, "Owen#1").GetAwaiter().GetResult();
 
         //Add friend relationship
-        duncan.Friends = new List<PmUser> { lars, tester,};
-        lars.Friends = new List<PmUser> { duncan, tester,};
-        tester.Friends = new List<PmUser> { lars, duncan,};
+        duncan.Friends = new List<PmUser> { lars, tester, };
+        lars.Friends = new List<PmUser> { duncan, tester, owen };
+        tester.Friends = new List<PmUser> { lars, duncan, };
 
         //Update created entries
         userManager.UpdateAsync(duncan).GetAwaiter().GetResult();
         userManager.UpdateAsync(lars).GetAwaiter().GetResult();
         userManager.UpdateAsync(tester).GetAwaiter().GetResult();
+        userManager.UpdateAsync(owen).GetAwaiter().GetResult();
 
-        // var roleManager = serviceScope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        //This doesn't work for some reason
-        // var role = new IdentityRole("User");
-        // roleManager.CreateAsync(role).GetAwaiter().GetResult();
-        // userManager.AddToRoleAsync(duncan, "User").GetAwaiter().GetResult();
-        // userManager.AddToRoleAsync(lars, "User").GetAwaiter().GetResult();
+
+        //Create chats
+        if (context.Chats.Any())
+            return;
+
+        var chatDL = new Chat
+        {
+            IsVisible = true,
+            Messages = new List<Message>
+            {
+                new Message
+                {
+                    Data = "Test message one",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = duncan
+                },
+                new Message
+                {
+                    Data = "10? Waarom 10?",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = lars
+                },
+                new Message
+                {
+                    Data = "Da's meer dan 11",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = duncan
+                },
+            },
+            Users = new List<PmUser> { duncan, lars },
+        };
+        var chatDT = new Chat
+        {
+            IsVisible = true,
+            Messages = new List<Message>
+            {
+                new Message
+                {
+                    Data = "Tester messaging Duncan",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = tester
+                },
+                new Message
+                {
+                    Data = "Messaging tester from Duncan",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = duncan
+                },
+            },
+            Users = new List<PmUser> { tester, duncan },
+        };
+        
+        var chatLO = new Chat
+        {
+            IsVisible = true,
+            Messages = new List<Message>
+            {
+                new Message
+                {
+                    Data = "Yo OWEN!",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = lars
+                },
+                new Message
+                {
+                    Data = "Breh",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = owen
+                },
+                new Message
+                {
+                    Data = "No waying you're insane",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = owen
+                },
+                new Message
+                {
+                   Data = "Pyramid.Spawn()",
+                   TimeStamp = DateTime.Now.ToLocalTime(),
+                   User = owen
+                },
+            },
+            Users = new List<PmUser> { lars, owen },
+        };
+
+        var chats = new List<Chat> { chatDL, chatDT, chatLO };
+        context.Chats.AddRange(chats);
+        context.SaveChanges();
     }
 
     //Maybe check if we can use this instead.
