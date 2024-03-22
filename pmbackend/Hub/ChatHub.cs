@@ -10,10 +10,11 @@ namespace pmbackend.Hub;
 public class ChatHub : Microsoft.AspNetCore.SignalR.Hub
 {
     private readonly UserManager<PmUser> _userManager;
-
-    public ChatHub(UserManager<PmUser> manager)
+    private readonly IChatRepository _chatRepository;
+    public ChatHub(UserManager<PmUser> manager, IChatRepository chatRepository)
     {
         _userManager = manager;
+        _chatRepository = chatRepository;
     }
 
     public override Task OnConnectedAsync()
@@ -25,7 +26,7 @@ public class ChatHub : Microsoft.AspNetCore.SignalR.Hub
 
         user.IsOnline = true;
         _userManager.UpdateAsync(user).GetAwaiter().GetResult();
-
+        
         Clients.All.SendAsync("ReceivePing", "*");
 
         return base.OnConnectedAsync();
@@ -48,4 +49,6 @@ public class ChatHub : Microsoft.AspNetCore.SignalR.Hub
 
     public async Task PingUser(string user) =>
         await Clients.All.SendAsync("ReceivePing", user);
+    
+    //TODO Create a chat from here
 }
