@@ -61,24 +61,32 @@ public class SeedDb
         var duncan = new PmUser
         {
             UserName = "Duncan",
+            Status = "Alive and well!",
+            Bio = "I like turtles",
             ProfileIcon = 0,
             Background = 0,
         };
         var lars = new PmUser
         {
             UserName = "Lars",
+            Status = "Freetime privileges revoked",
+            Bio = "I don't like turtles!",
             ProfileIcon = 0,
             Background = 0,
         };
         var tester = new PmUser
         {
             UserName = "Tester",
+            Status = "Currently testing things...",
+            Bio = "I love testing!",
             ProfileIcon = 1,
             Background = 0,
         };
         var owen = new PmUser
         {
             UserName = "Owen",
+            Status = "Alive and well!",
+            Bio = "I like turtles",
             ProfileIcon = 3,
             Background = 1,
         };
@@ -150,7 +158,7 @@ public class SeedDb
             },
             Users = new List<PmUser> { tester, duncan },
         };
-        
+
         var chatLO = new Chat
         {
             IsVisible = true,
@@ -176,9 +184,9 @@ public class SeedDb
                 },
                 new Message
                 {
-                   Data = "Pyramid.Spawn()",
-                   TimeStamp = DateTime.Now.ToLocalTime(),
-                   User = owen
+                    Data = "Pyramid.Spawn()",
+                    TimeStamp = DateTime.Now.ToLocalTime(),
+                    User = owen
                 },
             },
             Users = new List<PmUser> { lars, owen },
